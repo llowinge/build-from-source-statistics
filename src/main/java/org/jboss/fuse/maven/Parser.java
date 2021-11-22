@@ -66,7 +66,7 @@ public class Parser {
 
     public MavenArtifact parse() throws IOException {
         final List<String> lines = Files.readAllLines(dependencyTreeFile);
-        MavenArtifact parent = new MavenArtifact("org.jboss.fuse.maven:build-from-source-statistics:jar:1.0-SNAPSHOT");
+        MavenArtifact parent = new MavenArtifact(prepareGav(lines.get(0)));
         final MavenArtifact superParent = parent;
         for (int i = 1; i < lines.size(); i++) {
             String line = lines.get(i);
