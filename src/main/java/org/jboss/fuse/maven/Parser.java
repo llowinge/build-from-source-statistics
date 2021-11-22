@@ -2,7 +2,6 @@ package org.jboss.fuse.maven;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
@@ -43,23 +42,16 @@ public class Parser {
 
     public Statistics countStatistics(MavenArtifact artifact) {
         if (artifact.children.isEmpty()) {
-            Statistics freshCounting = artifact.freshStatistics();
-            artifact.productizedCount = freshCounting.productized;
-            artifact.communityCount = freshCounting.community;
-            return freshCounting;
-
+            return artifact.setStatistics(artifact.freshStatistics());
         }
-        int sumProductizedChildren = 0;
-        int sumCommunity = 0;
+        int sumProductizedChildren = 0, sumCommunity = 0;
         for (MavenArtifact child : artifact.children) {
             Statistics counting = countStatistics(child);
             sumProductizedChildren += counting.productized;
             sumCommunity += counting.community;
-
         }
-        artifact.productizedCount = artifact.freshStatistics().productized + sumProductizedChildren;
-        artifact.communityCount = artifact.freshStatistics().community + sumCommunity;
-        return artifact.actualStatistics();
+        return artifact.setStatistics(new Statistics(artifact.freshStatistics().productized + sumProductizedChildren,
+                artifact.freshStatistics().community + sumCommunity));
     }
 
     class Statistics {
@@ -80,11 +72,11 @@ public class Parser {
             String line = lines.get(i);
             MavenArtifact child = new MavenArtifact(prepareGav(line));
             child.parent = parent;
-            int detectedLevel = detectLevel(line);
             parent.addChild(child);
 
             if (i < lines.size() - 1) {
                 String nextLine = lines.get(i + 1);
+                int detectedLevel = detectLevel(line);
                 int nextLineLevel = detectLevel(nextLine);
                 if (nextLineLevel > detectedLevel) { // going deeper
                     parent = child;
@@ -154,6 +146,12 @@ public class Parser {
 
         boolean getProductized() {
             return version.contains("redhat");
+        }
+
+        Statistics setStatistics(Statistics statistics) {
+            productizedCount = statistics.productized;
+            communityCount = statistics.community;
+            return statistics;
         }
 
     }
