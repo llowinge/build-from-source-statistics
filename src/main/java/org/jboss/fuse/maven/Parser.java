@@ -1,3 +1,6 @@
+///usr/bin/env jbang "$0" "$@" ; exit $?
+//DEPS com.fasterxml.jackson.core:jackson-databind:2.13.0
+
 package org.jboss.fuse.maven;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;

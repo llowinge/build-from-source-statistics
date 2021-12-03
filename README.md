@@ -212,6 +212,15 @@ json for further calculations.
 
 ## Build and use
 
+### JBang approach
+
+    jbang https://raw.githubusercontent.com/llowinge/build-from-source-statistics/main/src/main/java/org/jboss/fuse/maven/Parser.java <path-to-dep-tree.txt> <path-to-output-json> 
+    
+OR
+    
+    jbang src/main/java/org/jboss/fuse/maven/Parser.java <path-to-dep-tree.txt> <path-to-output-json>
+
+### Maven approach
 Firstly build the extension.
 
     mvn clean install
